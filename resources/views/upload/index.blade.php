@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Upload Dokumen PDF & Parsing')
-@section('page_heading', 'Upload Dokumen Realisasi PDF')
+@section('title', 'Upload Dokumen & Foto Realisasi')
+@section('page_heading', 'Upload PDF & Foto Bukti Realisasi')
 
 @section('content')
 <div class="row">
@@ -9,9 +9,20 @@
     <div class="col-lg-5 col-12 mb-4">
         <div class="card-custom p-4">
             <h6 class="fw-bold text-danger mb-3">
-                <i class="fas fa-cloud-upload-alt me-2"></i> Form Pengunggahan PDF Realisasi
+                <i class="fas fa-cloud-upload-alt me-2"></i> Form Pengunggahan Dokumen / Foto Bukti
             </h6>
-            <p class="text-muted small mb-4">Pilih OPD, periode, dan unggah berkas PDF resmi. Sistem akan membaca dan mengoperasikan ekstraksi data secara otomatis.</p>
+            <p class="text-muted small mb-4">Pilih OPD, periode, dan unggah berkas PDF resmi atau Foto Bukti (JPG/PNG/WEBP). Sistem akan membaca dan mengoperasikan ekstraksi data secara otomatis.</p>
+
+            @if($errors->any())
+                <div class="alert alert-danger border-danger-subtle rounded-3 small p-3 mb-3">
+                    <div class="fw-bold mb-1"><i class="fas fa-triangle-exclamation me-1"></i> Perhatian:</div>
+                    <ul class="mb-0 ps-3">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <form action="{{ route('upload.process') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -28,33 +39,34 @@
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <label class="form-label fw-bold small text-muted">Periode Bulan</label>
-                        <select name="periode_bulan" id="periodeBulanSelect" class="form-select rounded-3 border-danger-subtle" required onchange="updateFullPeriode()">
-                            @foreach($bulanList as $bln)
-                                <option value="{{ $bln }}" {{ (date('F') == $bln || $bln == 'Agustus') ? 'selected' : '' }}>{{ $bln }}</option>
-                            @endforeach
+                        <select name="periode" class="form-select rounded-3 border-danger-subtle" required>
+                            <option value="Agustus 2026" selected>Agustus 2026</option>
+                            <option value="Juli 2026">Juli 2026</option>
+                            <option value="Juni 2026">Juni 2026</option>
                         </select>
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-bold small text-muted">Tahun Anggaran</label>
-                        <input type="number" name="tahun" id="tahunSelect" class="form-control rounded-3 border-danger-subtle fw-bold" value="{{ $currentYear ?? 2026 }}" placeholder="Contoh: 2026" min="2000" max="2100" required oninput="updateFullPeriode()">
+                        <select name="tahun" class="form-select rounded-3 border-danger-subtle" required>
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                        </select>
                     </div>
                 </div>
-                <!-- Hidden input untuk menyatukan periode seperti 'Agustus 2026' -->
-                <input type="hidden" name="periode" id="fullPeriodeInput" value="Agustus 2026">
 
-                <!-- Drag and drop PDF box -->
+                <!-- Drag and drop upload box for PDF / Images -->
                 <div class="mb-4">
-                    <label class="form-label fw-bold small text-muted">Berkas PDF Realisasi (.pdf)</label>
+                    <label class="form-label fw-bold small text-muted">Berkas PDF atau Foto Bukti (PDF / JPG / PNG / WEBP)</label>
                     <div class="border border-2 border-danger-subtle rounded-4 p-4 text-center bg-light" id="dropZone" style="border-style: dashed !important;">
-                        <i class="fas fa-file-pdf fa-3x text-danger opacity-75 mb-2"></i>
-                        <h6 class="fw-bold mb-1">Pilih Berkas atau Seret ke Sini</h6>
-                        <small class="text-muted d-block mb-3">Format PDF resmi retribusi daerah (Maksimal 10 MB)</small>
-                        <input type="file" name="file_pdf" id="filePdf" class="form-control" accept=".pdf" required>
+                        <i class="fas fa-file-image fa-3x text-danger opacity-75 mb-2"></i>
+                        <h6 class="fw-bold mb-1">Pilih Berkas PDF / Foto Bukti</h6>
+                        <small class="text-muted d-block mb-3">Format PDF, JPG, JPEG, PNG, WEBP (Maksimal 10 MB)</small>
+                        <input type="file" name="file_upload" id="fileUpload" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" required>
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn-red w-100 py-2 fw-bold shadow-sm">
-                    <i class="fas fa-microchip me-2"></i> Ekstraksi Data PDF & Parsing
+                    <i class="fas fa-microchip me-2"></i> Ekstraksi Data PDF & Parsing Berkas
                 </button>
             </form>
         </div>
@@ -64,44 +76,32 @@
     <div class="col-lg-7 col-12">
         <div class="card-custom p-4">
             <h6 class="fw-bold text-danger mb-3">
-                <i class="fas fa-circle-info me-2"></i> Alur Proses Ekstraksi PDF ke Database
+                <i class="fas fa-circle-info me-2"></i> Alur Proses Ekstraksi PDF & Foto Bukti
             </h6>
             
             <div class="timeline ps-3 border-start border-danger border-2 ms-2">
                 <div class="mb-4 position-relative">
                     <span class="badge bg-danger rounded-circle position-absolute" style="left: -26px; top: 0; width: 22px; height: 22px;">1</span>
-                    <h6 class="fw-bold mb-1 text-dark">Unggah Berkas PDF</h6>
-                    <p class="text-muted small mb-0">Operator OPD mengunggah dokumen PDF rekapitulasi realisasi bulanan.</p>
+                    <h6 class="fw-bold mb-1 text-dark">Unggah Berkas PDF atau Foto Kwitansi</h6>
+                    <p class="text-muted small mb-0">Operator OPD mengunggah dokumen PDF atau foto bukti fisik kwitansi/lapangan.</p>
                 </div>
                 <div class="mb-4 position-relative">
                     <span class="badge bg-danger rounded-circle position-absolute" style="left: -26px; top: 0; width: 22px; height: 22px;">2</span>
                     <h6 class="fw-bold mb-1 text-dark">Sistem Ekstraksi (Parser Engine)</h6>
-                    <p class="text-muted small mb-0">Sistem menganalisis struktur PDF dan mengekstrak Kode Rekening, Nama Retribusi, dan Nilai Realisasi (Rp).</p>
+                    <p class="text-muted small mb-0">Sistem mengekstrak Kode Rekening, Nama Retribusi, dan Nilai Realisasi (Rp).</p>
                 </div>
                 <div class="mb-4 position-relative">
                     <span class="badge bg-danger rounded-circle position-absolute" style="left: -26px; top: 0; width: 22px; height: 22px;">3</span>
                     <h6 class="fw-bold mb-1 text-dark">Preview & Validasi Interaktif</h6>
-                    <p class="text-muted small mb-0">Operator memeriksa dan memperbaiki nilai jika ada kesalahan pengetikan sebelum disimpan permanen.</p>
+                    <p class="text-muted small mb-0">Operator dapat melihat foto bukti pada tabel validasi dan menyesuaikan data sebelum disimpan.</p>
                 </div>
                 <div class="position-relative">
                     <span class="badge bg-danger rounded-circle position-absolute" style="left: -26px; top: 0; width: 22px; height: 22px;">4</span>
-                    <h6 class="fw-bold mb-1 text-dark">Simpan Database & Grafik Audit</h6>
-                    <p class="text-muted small mb-0">Data tersimpan di MySQL, siap diekspor ke Excel dan direkap pada Dashboard BAPENDA.</p>
+                    <h6 class="fw-bold mb-1 text-dark">Simpan Database & Galeri Bukti</h6>
+                    <p class="text-muted small mb-0">Data dan foto tersimpan di MySQL, siap diekspor ke Excel dan dicetak dalam laporan resmi.</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
-
-@section('scripts')
-<script>
-    function updateFullPeriode() {
-        const bln = document.getElementById('periodeBulanSelect').value;
-        const thn = document.getElementById('tahunSelect').value;
-        document.getElementById('fullPeriodeInput').value = `${bln} ${thn}`;
-    }
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', updateFullPeriode);
-</script>
 @endsection

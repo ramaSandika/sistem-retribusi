@@ -4,31 +4,50 @@
 @section('page_heading', 'Overview Realisasi Retribusi')
 
 @section('content')
-<!-- Filter Tahun Bar -->
+{{-- WELCOME HEADER --}}
 <div class="card-custom p-3 mb-4">
-    <form action="{{ route('dashboard') }}" method="GET" class="row g-3 align-items-center">
-        <div class="col-auto">
-            <label class="fw-bold text-muted small"><i class="fas fa-filter me-1 text-danger"></i> Filter Periode:</label>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+            <h5 class="fw-bold mb-1" style="font-size: clamp(0.95rem, 2.5vw, 1.15rem);">
+                <i class="fas fa-chart-pie me-2 text-danger"></i>Dashboard Realisasi Retribusi
+            </h5>
+            <small style="color:rgba(255,255,255,0.50);">
+                Selamat datang, <strong class="text-white">{{ Auth::user()->name }}</strong>
+                — {{ Auth::user()->opd_name }}
+            </small>
         </div>
-        <div class="col-auto">
-            <select name="bulan" class="form-select form-select-sm rounded-3 border-danger-subtle fw-semibold" onchange="this.form.submit()">
-                @foreach($bulanList as $bln)
-                    <option value="{{ $bln }}" {{ $selectedBulan == $bln ? 'selected' : '' }}>Bulan {{ $bln }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-auto">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text bg-light text-muted border-danger-subtle"><i class="fas fa-calendar-alt"></i></span>
-                <input type="number" name="tahun" class="form-control form-control-sm border-danger-subtle fw-bold" style="width: 100px;" value="{{ $tahun }}" placeholder="Tahun" min="2000" max="2100">
-                <button type="submit" class="btn btn-sm btn-danger fw-bold">Terapkan</button>
+        <div class="text-end">
+            <div class="badge px-3 py-2 rounded-3" style="background:rgba(220,38,38,0.18);border:1px solid rgba(220,38,38,0.35);color:#fca5a5;font-size:0.78rem;">
+                <i class="fas fa-calendar-alt me-1"></i>{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
             </div>
         </div>
-        <div class="col-auto ms-auto">
-            <span class="badge bg-danger text-white px-3 py-2 rounded-pill fw-bold">
-                <i class="fas fa-building me-1"></i> Unit OPD: {{ strtoupper($user->opd_name) }}
-            </span>
+    </div>
+</div>
+
+<!-- Filter Tahun Bar -->
+<div class="card-custom p-3 mb-4">
+    <form action="{{ route('dashboard') }}" method="GET"
+          class="d-flex flex-wrap gap-2 align-items-center">
+        <label class="fw-semibold small mb-0" style="color:rgba(255,255,255,0.65);">
+            <i class="fas fa-filter me-1 text-danger"></i> Filter:
+        </label>
+        <select name="bulan" class="form-select form-select-sm rounded-3 fw-semibold"
+                style="width:auto; min-width:130px;" onchange="this.form.submit()">
+            @foreach($bulanList as $bln)
+                <option value="{{ $bln }}" {{ $selectedBulan == $bln ? 'selected' : '' }}>
+                    Bulan {{ $bln }}
+                </option>
+            @endforeach
+        </select>
+        <div class="input-group input-group-sm" style="width:auto;">
+            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+            <input type="number" name="tahun" class="form-control fw-bold"
+                   style="width:80px;" value="{{ $tahun }}" min="2000" max="2100">
+            <button type="submit" class="btn btn-sm btn-danger fw-bold">Terapkan</button>
         </div>
+        <span class="badge badge-red px-2 py-1 rounded-pill ms-auto d-none d-sm-inline-flex">
+            <i class="fas fa-building me-1"></i> {{ strtoupper($user->opd_name) }}
+        </span>
     </form>
 </div>
 
@@ -119,54 +138,105 @@
     </div>
 </div>
 
-<!-- RECENT PDF UPLOADS TABLE -->
+<!-- RECENT PDF UPLOADS - CARD LIST -->
 <div class="card-custom p-4">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <h6 class="fw-bold mb-0 text-danger"><i class="fas fa-clock-rotate-left me-2"></i>Aktivitas Upload Dokumen Terakhir</h6>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h6 class="fw-bold mb-0" style="color:#fca5a5;">
+                <i class="fas fa-clock-rotate-left me-2"></i>Aktivitas Upload Dokumen Terakhir
+            </h6>
+            <small style="color:rgba(255,255,255,0.45);">Riwayat unggah dokumen PDF & foto bukti</small>
+        </div>
         <a href="{{ route('upload.index') }}" class="btn btn-sm btn-red">
-            <i class="fas fa-plus me-1"></i> Upload PDF Baru
+            <i class="fas fa-plus me-1"></i> Upload Baru
         </a>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th class="small text-muted">File PDF</th>
-                    <th class="small text-muted">Periode</th>
-                    <th class="small text-muted">OPD / Instansi</th>
-                    <th class="small text-muted">Total Nilai</th>
-                    <th class="small text-muted">Status Parsing</th>
-                    <th class="small text-muted">Tanggal Upload</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentUploads as $item)
-                    <tr>
-                        <td class="fw-bold text-danger">
-                            <i class="fas fa-file-pdf me-2"></i>{{ $item->original_filename }}
-                        </td>
-                        <td><span class="badge bg-light text-dark border">{{ $item->periode }}</span></td>
-                        <td class="small fw-semibold">{{ $item->opd_name }}</td>
-                        <td class="fw-bold text-success">Rp {{ number_format($item->total_nilai, 0, ',', '.') }}</td>
-                        <td>
-                            @if($item->status === 'Success')
-                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fas fa-check-circle me-1"></i> Success</span>
-                            @elseif($item->status === 'Processing')
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"><i class="fas fa-spinner fa-spin me-1"></i> Processing</span>
-                            @else
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="fas fa-times-circle me-1"></i> Failed</span>
-                            @endif
-                        </td>
-                        <td class="small text-muted">{{ $item->created_at->format('d M Y, H:i') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-muted py-4">Belum ada dokumen PDF diupload.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+
+    @forelse($recentUploads as $item)
+    <div class="d-flex align-items-start gap-3 mb-3 pb-3"
+         style="border-bottom: 1px solid rgba(255,255,255,0.08); {{ $loop->last ? 'border-bottom:none; margin-bottom:0; padding-bottom:0;' : '' }}">
+
+        {{-- Ikon file / status indicator --}}
+        <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-3"
+             style="width:46px; height:46px; background:
+                @if($item->status === 'Success') rgba(22,163,74,0.18);
+                @elseif($item->status === 'Processing') rgba(234,179,8,0.18);
+                @else rgba(220,38,38,0.18); @endif
+             ">
+            @if($item->status === 'Success')
+                <i class="fas fa-file-circle-check fa-lg" style="color:#86efac;"></i>
+            @elseif($item->status === 'Processing')
+                <i class="fas fa-file-circle-exclamation fa-lg fa-spin" style="color:#fde68a;"></i>
+            @else
+                <i class="fas fa-file-circle-xmark fa-lg" style="color:#fca5a5;"></i>
+            @endif
+        </div>
+
+        {{-- Info utama --}}
+        <div class="flex-grow-1 min-w-0">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-1 mb-1">
+                <span class="fw-bold text-truncate" style="color:#fff; font-size:0.88rem; max-width:240px;">
+                    {{ $item->original_filename }}
+                </span>
+                {{-- Badge Status --}}
+                @if($item->status === 'Success')
+                    <span class="badge rounded-pill px-2 py-1"
+                          style="background:rgba(22,163,74,0.20);border:1px solid rgba(22,163,74,0.40);color:#86efac;font-size:0.72rem;">
+                        <i class="fas fa-check-circle me-1"></i>Terverifikasi
+                    </span>
+                @elseif($item->status === 'Processing')
+                    <span class="badge rounded-pill px-2 py-1"
+                          style="background:rgba(234,179,8,0.20);border:1px solid rgba(234,179,8,0.40);color:#fde68a;font-size:0.72rem;">
+                        <i class="fas fa-spinner fa-spin me-1"></i>Diproses
+                    </span>
+                @else
+                    <span class="badge rounded-pill px-2 py-1"
+                          style="background:rgba(220,38,38,0.20);border:1px solid rgba(220,38,38,0.40);color:#fca5a5;font-size:0.72rem;">
+                        <i class="fas fa-times-circle me-1"></i>Gagal
+                    </span>
+                @endif
+            </div>
+
+            {{-- Meta info baris 2 --}}
+            <div class="d-flex flex-wrap gap-2 align-items-center" style="font-size:0.78rem;">
+                <span style="color:rgba(255,255,255,0.50);">
+                    <i class="fas fa-building me-1" style="color:#fca5a5;"></i>
+                    {{ $item->opd_name }}
+                </span>
+                <span style="color:rgba(255,255,255,0.30);">•</span>
+                <span style="color:rgba(255,255,255,0.50);">
+                    <i class="fas fa-calendar-alt me-1" style="color:#fca5a5;"></i>
+                    {{ $item->periode }}
+                </span>
+                <span style="color:rgba(255,255,255,0.30);">•</span>
+                <span class="fw-bold" style="color:#86efac;">
+                    Rp {{ number_format($item->total_nilai, 0, ',', '.') }}
+                </span>
+            </div>
+        </div>
+
+        {{-- Waktu upload (kanan) --}}
+        <div class="flex-shrink-0 text-end d-none d-sm-block">
+            <small style="color:rgba(255,255,255,0.38); font-size:0.72rem; line-height:1.4;">
+                {{ $item->created_at->format('d M Y') }}<br>
+                <span style="color:rgba(255,255,255,0.25);">{{ $item->created_at->format('H:i') }}</span>
+            </small>
+        </div>
     </div>
+    @empty
+    <div class="text-center py-5">
+        <div class="mb-3">
+            <i class="fas fa-inbox fa-3x" style="color:rgba(255,255,255,0.15);"></i>
+        </div>
+        <p class="mb-1 fw-semibold" style="color:rgba(255,255,255,0.45);">Belum ada dokumen diupload</p>
+        <small style="color:rgba(255,255,255,0.25);">Mulai upload PDF atau foto bukti realisasi</small>
+        <div class="mt-3">
+            <a href="{{ route('upload.index') }}" class="btn btn-sm btn-red">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Upload Sekarang
+            </a>
+        </div>
+    </div>
+    @endforelse
 </div>
 @endsection
 

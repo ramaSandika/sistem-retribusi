@@ -76,16 +76,39 @@ class RealisasiController extends Controller
             'kode_rekening' => 'required|string',
             'nama_retribusi' => 'required|string',
             'nilai' => 'required|numeric',
+            'foto_bukti' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $item = RealisasiRetribusi::findOrFail($id);
         $user = Auth::user();
 
         $oldNilai = $item->nilai;
+        $fotoBuktiName = $item->foto_bukti;
+
+        if ($request->hasFile('foto_bukti')) {
+            $fotoPath = public_path('uploads/foto_bukti');
+            if (!file_exists($fotoPath)) {
+                mkdir($fotoPath, 0755, true);
+            }
+            $file = $request->file('foto_bukti');
+            $newFotoName = 'foto_' . time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file->move($fotoPath, $newFotoName);
+
+            // Clean up old file if not used elsewhere
+            if ($fotoBuktiName && file_exists($fotoPath . '/' . $fotoBuktiName)) {
+                $usedElsewhere = RealisasiRetribusi::where('foto_bukti', $fotoBuktiName)->where('id', '!=', $id)->exists();
+                if (!$usedElsewhere) {
+                    @unlink($fotoPath . '/' . $fotoBuktiName);
+                }
+            }
+            $fotoBuktiName = $newFotoName;
+        }
+
         $item->update([
             'kode_rekening' => $request->kode_rekening,
             'nama_retribusi' => $request->nama_retribusi,
             'nilai' => $request->nilai,
+            'foto_bukti' => $fotoBuktiName,
         ]);
 
         AuditLog::create([
@@ -97,6 +120,70 @@ class RealisasiController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Data realisasi retribusi berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $item = RealisasiRetribusi::findOrFail($id);
+        $user = Auth::user();
+
+        // Delete physical photo file if not referenced elsewhere
+        if ($item->foto_bukti) {
+            $fotoPath = public_path('uploads/foto_bukti/' . $item->foto_bukti);
+            $usedElsewhere = RealisasiRetribusi::where('foto_bukti', $item->foto_bukti)->where('id', '!=', $id)->exists();
+            if (!$usedElsewhere && file_exists($fotoPath)) {
+                @unlink($fotoPath);
+            }
+        }
+
+        AuditLog::create([
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'action' => 'DELETE_DATA',
+            'details' => "Menghapus item realisasi {$item->kode_rekening} ({$item->nama_retribusi}) senilai Rp " . number_format($item->nilai, 0, ',', '.'),
+            'ip_address' => request()->ip(),
+        ]);
+
+        $item->delete();
+
+        return redirect()->back()->with('success', 'Data realisasi retribusi & berkas fisik berhasil dihapus.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'selected_ids' => 'required|array',
+            'selected_ids.*' => 'exists:realisasi_retribusis,id',
+        ]);
+
+        $user = Auth::user();
+        $items = RealisasiRetribusi::whereIn('id', $request->selected_ids)->get();
+
+        $count = $items->count();
+        $totalNilai = $items->sum('nilai');
+
+        foreach ($items as $item) {
+            if ($item->foto_bukti) {
+                $fotoPath = public_path('uploads/foto_bukti/' . $item->foto_bukti);
+                $usedElsewhere = RealisasiRetribusi::where('foto_bukti', $item->foto_bukti)
+                                                    ->whereNotIn('id', $request->selected_ids)
+                                                    ->exists();
+                if (!$usedElsewhere && file_exists($fotoPath)) {
+                    @unlink($fotoPath);
+                }
+            }
+            $item->delete();
+        }
+
+        AuditLog::create([
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'action' => 'BULK_DELETE',
+            'details' => "Menghapus massal {$count} data realisasi retribusi senilai total Rp " . number_format($totalNilai, 0, ',', '.'),
+            'ip_address' => $request->ip(),
+        ]);
+
+        return redirect()->back()->with('success', "{$count} data realisasi retribusi berhasil dihapus secara permanen.");
     }
 
     public function printReport(Request $request)
@@ -173,66 +260,5 @@ class RealisasiController extends Controller
         $html = view('realisasi.excel', compact('records', 'totalNilai', 'tahun', 'opd', 'user'))->render();
 
         return response($html, 200, $headers);
-    }
-
-    public function bulkDelete(Request $request)
-    {
-        $request->validate([
-            'selected_ids' => 'required|array',
-            'selected_ids.*' => 'exists:realisasi_retribusis,id',
-        ]);
-
-        $user = Auth::user();
-        $query = RealisasiRetribusi::whereIn('id', $request->selected_ids);
-
-        // Jika bukan admin, pastikan hanya bisa menghapus data milik OPD-nya sendiri
-        if (!$user->isAdmin()) {
-            $query->where('opd_name', $user->opd_name);
-        }
-
-        $itemsToDelete = $query->get();
-        $count = $itemsToDelete->count();
-
-        if ($count === 0) {
-            return redirect()->back()->with('error', 'Tidak ada data yang dapat dihapus atau Anda tidak memiliki hak akses.');
-        }
-
-        $totalVal = $itemsToDelete->sum('nilai');
-
-        // Hapus data
-        $query->delete();
-
-        AuditLog::create([
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'action' => 'BULK_DELETE_DATA',
-            'details' => "Menghapus massal {$count} data realisasi retribusi sekaligus (Total Nilai: Rp " . number_format($totalVal, 0, ',', '.') . ")",
-            'ip_address' => $request->ip(),
-        ]);
-
-        return redirect()->back()->with('success', "Berhasil menghapus {$count} data realisasi retribusi terpilih.");
-    }
-
-    public function destroy($id)
-    {
-        $item = RealisasiRetribusi::findOrFail($id);
-        $user = Auth::user();
-
-        // Validasi hak akses jika bukan admin
-        if (!$user->isAdmin() && $item->opd_name !== $user->opd_name) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki hak akses untuk menghapus data ini.');
-        }
-
-        AuditLog::create([
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'action' => 'DELETE_DATA',
-            'details' => "Menghapus item realisasi {$item->kode_rekening} ({$item->nama_retribusi}) senilai Rp " . number_format($item->nilai, 0, ',', '.'),
-            'ip_address' => request()->ip(),
-        ]);
-
-        $item->delete();
-
-        return redirect()->back()->with('success', 'Data realisasi retribusi berhasil dihapus.');
     }
 }

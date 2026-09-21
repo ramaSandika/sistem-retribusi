@@ -6,6 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\RealisasiController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MasterRetribusiController;
 use App\Http\Middleware\EnsureIsAdmin;
 
 // Public Guest Routes
@@ -27,6 +30,10 @@ Route::middleware('auth')->group(function () {
     // Dashboard Overview
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Profile & Password Management
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
     // Upload PDF & Preview Validation
     Route::get('/upload', [UploadController::class, 'index'])->name('upload.index');
     Route::post('/upload/process', [UploadController::class, 'process'])->name('upload.process');
@@ -40,6 +47,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/realisasi/print', [RealisasiController::class, 'printReport'])->name('realisasi.print');
     Route::delete('/realisasi/{id}', [RealisasiController::class, 'destroy'])->name('realisasi.destroy');
 
-    // Audit Log Trail (Strictly Admin Only)
-    Route::get('/audit', [AuditController::class, 'index'])->middleware(EnsureIsAdmin::class)->name('audit.index');
+    // Strictly Admin Only Routes
+    Route::middleware(EnsureIsAdmin::class)->group(function () {
+        Route::get('/master-retribusi', [MasterRetribusiController::class, 'index'])->name('master.index');
+        Route::post('/master-retribusi', [MasterRetribusiController::class, 'store'])->name('master.store');
+        Route::put('/master-retribusi/{id}', [MasterRetribusiController::class, 'update'])->name('master.update');
+        Route::delete('/master-retribusi/{id}', [MasterRetribusiController::class, 'destroy'])->name('master.destroy');
+
+        Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 });

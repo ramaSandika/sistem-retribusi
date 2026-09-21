@@ -13,6 +13,7 @@ class UploadRetribusi extends Model
         'user_id',
         'filename',
         'original_filename',
+        'foto_bukti',
         'tahun',
         'periode',
         'opd_name',

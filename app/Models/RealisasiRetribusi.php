@@ -16,6 +16,7 @@ class RealisasiRetribusi extends Model
         'nama_retribusi',
         'opd_name',
         'nilai',
+        'foto_bukti',
         'periode',
         'tahun',
         'tanggal_realisasi',
