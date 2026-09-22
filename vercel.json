@@ -1,8 +1,8 @@
-{
+﻿{
   "version": 2,
   "framework": null,
   "outputDirectory": "public",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build && php artisan migrate --force",
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.3"
@@ -27,17 +27,25 @@
     }
   ],
   "env": {
+    "APP_NAME": "Sistem Retribusi",
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
     "APP_KEY": "base64:r6fxya6ciN4rkh8UzxSFSFDeptt7Py2ZE7tERA3Hoeo=",
+    "APP_DEBUG": "true",
+    "APP_URL": "https://sistem-retribusi-umber.vercel.app",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
     "APP_ROUTES_CACHE": "/tmp/routes.php",
     "APP_SERVICES_CACHE": "/tmp/services.php",
     "VIEW_COMPILED_PATH": "/tmp",
-    "CACHE_STORE": "array",
     "SESSION_DRIVER": "cookie",
-    "LOG_CHANNEL": "stderr"
+    "CACHE_STORE": "array",
+    "QUEUE_CONNECTION": "sync",
+    "LOG_CHANNEL": "stderr",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "db-retribusi-ramap0346-ef86.h.aivencloud.com",
+    "DB_PORT": "25577",
+    "DB_DATABASE": "defaultdb",
+    "DB_USERNAME": "avnadmin"
   }
 }
