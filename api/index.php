@@ -4,6 +4,19 @@
  * Vercel Serverless Entry Point untuk Laravel
  */
 
+// Siapkan folder storage dan cache di /tmp (satu-satunya filesystem yang writable di Vercel)
+$dirs = [
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/framework/cache',
+    '/tmp/storage/logs',
+];
+foreach ($dirs as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+}
+
 $envVars = [
     'APP_NAME'             => 'Sistem Retribusi',
     'APP_ENV'              => 'production',
@@ -14,7 +27,7 @@ $envVars = [
     'APP_LOCALE'           => 'en',
     'APP_FALLBACK_LOCALE'  => 'en',
     'APP_FAKER_LOCALE'     => 'en_US',
-    'VIEW_COMPILED_PATH'   => '/tmp',
+    'VIEW_COMPILED_PATH'   => '/tmp/storage/framework/views',
     'SESSION_DRIVER'       => 'cookie',
     'SESSION_LIFETIME'     => '120',
     'CACHE_STORE'          => 'array',
