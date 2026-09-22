@@ -265,9 +265,12 @@
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-7">
-                            <label class="form-label">Periode / Bulan</label>
-                            <input type="text" name="periode" class="form-control rounded-3"
-                                   value="{{ $row->periode }}" required>
+                            <label class="form-label">Pilihan Bulan</label>
+                            <select name="periode" class="form-select rounded-3" required>
+                                @foreach(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $mName)
+                                    <option value="{{ $mName }}" {{ (strtolower($row->periode) == strtolower($mName) || str_contains(strtolower($row->periode), strtolower($mName))) ? 'selected' : '' }}>{{ $mName }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-5">
                             <label class="form-label">Tahun</label>

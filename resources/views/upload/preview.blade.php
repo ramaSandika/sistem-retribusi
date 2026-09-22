@@ -27,9 +27,16 @@
 
         <div class="row g-3 mb-4 p-3 rounded-3" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12);">
             <div class="col-md-6 col-12">
-                <label class="form-label text-white small fw-bold mb-1">Periode / Bulan</label>
-                <input type="text" name="periode" class="form-control form-control-sm rounded-3 fw-bold" value="{{ $periode }}" required>
-                <small class="text-white-50" style="font-size: 0.72rem;">Bisa Anda ubah sekarang jika ingin ganti periode</small>
+                <label class="form-label text-white small fw-bold mb-1">Pilihan Bulan</label>
+                <select name="periode" class="form-select form-select-sm rounded-3 fw-bold" required>
+                    @php
+                        $bulanList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                    @endphp
+                    @foreach($bulanList as $b)
+                        <option value="{{ $b }}" {{ (strtolower($periode) == strtolower($b) || str_contains(strtolower($periode), strtolower($b))) ? 'selected' : '' }}>{{ $b }}</option>
+                    @endforeach
+                </select>
+                <small class="text-white-50" style="font-size: 0.72rem;">Bisa Anda ubah sekarang jika ingin ganti bulan</small>
             </div>
             <div class="col-md-6 col-12">
                 <label class="form-label text-white small fw-bold mb-1">Tahun Anggaran</label>
