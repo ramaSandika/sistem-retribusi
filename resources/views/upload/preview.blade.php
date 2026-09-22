@@ -25,6 +25,19 @@
         @csrf
         <input type="hidden" name="upload_id" value="{{ $upload->id }}">
 
+        <div class="row g-3 mb-4 p-3 rounded-3" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12);">
+            <div class="col-md-6 col-12">
+                <label class="form-label text-white small fw-bold mb-1">Periode / Bulan</label>
+                <input type="text" name="periode" class="form-control form-control-sm rounded-3 fw-bold" value="{{ $periode }}" required>
+                <small class="text-white-50" style="font-size: 0.72rem;">Bisa Anda ubah sekarang jika ingin ganti periode</small>
+            </div>
+            <div class="col-md-6 col-12">
+                <label class="form-label text-white small fw-bold mb-1">Tahun Anggaran</label>
+                <input type="number" name="tahun" class="form-control form-control-sm rounded-3 fw-bold" value="{{ $tahun }}" min="2000" max="2099" required>
+                <small class="text-white-50" style="font-size: 0.72rem;">Bisa Anda ubah sekarang jika ingin ganti tahun</small>
+            </div>
+        </div>
+
         <div class="table-responsive mb-4 rounded-3" style="background: rgba(0,0,0,0.30); border: 1px solid rgba(255,255,255,0.15);">
             <table class="table table-bordered align-middle" id="previewTable">
                 <thead>

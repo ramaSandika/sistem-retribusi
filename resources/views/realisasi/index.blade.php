@@ -263,6 +263,18 @@
                         <input type="text" name="nama_retribusi" class="form-control rounded-3"
                                value="{{ $row->nama_retribusi }}" required>
                     </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-7">
+                            <label class="form-label">Periode / Bulan</label>
+                            <input type="text" name="periode" class="form-control rounded-3"
+                                   value="{{ $row->periode }}" required>
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label">Tahun</label>
+                            <input type="number" name="tahun" class="form-control rounded-3"
+                                   value="{{ $row->tahun }}" min="2000" max="2099" required>
+                        </div>
+                    </div>
                     <div class="mb-1">
                         <label class="form-label">Nilai Realisasi (Rp)</label>
                         <input type="number" name="nilai" class="form-control rounded-3 fw-bold"

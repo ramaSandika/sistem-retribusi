@@ -75,6 +75,8 @@ class RealisasiController extends Controller
         $request->validate([
             'kode_rekening' => 'required|string',
             'nama_retribusi' => 'required|string',
+            'periode' => 'nullable|string',
+            'tahun' => 'nullable|integer',
             'nilai' => 'required|numeric',
             'foto_bukti' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
@@ -107,6 +109,8 @@ class RealisasiController extends Controller
         $item->update([
             'kode_rekening' => $request->kode_rekening,
             'nama_retribusi' => $request->nama_retribusi,
+            'periode' => $request->filled('periode') ? $request->periode : $item->periode,
+            'tahun' => $request->filled('tahun') ? (int)$request->tahun : $item->tahun,
             'nilai' => $request->nilai,
             'foto_bukti' => $fotoBuktiName,
         ]);

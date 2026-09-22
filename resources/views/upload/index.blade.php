@@ -38,19 +38,34 @@
 
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="form-label fw-bold text-white mb-2">Periode Bulan</label>
-                        <select name="periode" class="form-select rounded-3 border-danger-subtle" required>
-                            <option value="Agustus 2026" selected>Agustus 2026</option>
-                            <option value="Juli 2026">Juli 2026</option>
-                            <option value="Juni 2026">Juni 2026</option>
-                        </select>
+                        <label class="form-label fw-bold text-white mb-2">Periode / Bulan</label>
+                        <input type="text" name="periode" list="listPeriode" class="form-control rounded-3 border-danger-subtle" placeholder="Contoh: Semester 1, Juli 2025, dll" value="{{ old('periode', 'Semester 1') }}" required>
+                        <datalist id="listPeriode">
+                            <option value="Semester 1">
+                            <option value="Semester 2">
+                            <option value="Januari">
+                            <option value="Februari">
+                            <option value="Maret">
+                            <option value="April">
+                            <option value="Mei">
+                            <option value="Juni">
+                            <option value="Juli">
+                            <option value="Agustus">
+                            <option value="September">
+                            <option value="Oktober">
+                            <option value="November">
+                            <option value="Desember">
+                            <option value="Triwulan 1">
+                            <option value="Triwulan 2">
+                            <option value="Triwulan 3">
+                            <option value="Triwulan 4">
+                        </datalist>
+                        <small class="text-white-50" style="font-size: 0.72rem;">Bisa ketik periode/bulan apa saja</small>
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-bold text-white mb-2">Tahun Anggaran</label>
-                        <select name="tahun" class="form-select rounded-3 border-danger-subtle" required>
-                            <option value="2026" selected>2026</option>
-                            <option value="2025">2025</option>
-                        </select>
+                        <input type="number" name="tahun" class="form-control rounded-3 border-danger-subtle" placeholder="Contoh: 2025" value="{{ old('tahun', date('Y')) }}" min="2000" max="2099" required>
+                        <small class="text-white-50" style="font-size: 0.72rem;">Bisa isi tahun berapa saja bebas</small>
                     </div>
                 </div>
 

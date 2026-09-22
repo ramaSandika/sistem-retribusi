@@ -124,6 +124,8 @@ class UploadController extends Controller
     {
         $request->validate([
             'upload_id' => 'required|exists:upload_retribusis,id',
+            'periode' => 'nullable|string',
+            'tahun' => 'nullable|integer',
             'kode_rekening' => 'required|array',
             'nama_retribusi' => 'required|array',
             'nilai' => 'required|array',
@@ -131,6 +133,9 @@ class UploadController extends Controller
 
         $user = Auth::user();
         $upload = UploadRetribusi::findOrFail($request->upload_id);
+
+        $periode = $request->filled('periode') ? $request->periode : $upload->periode;
+        $tahun = $request->filled('tahun') ? (int)$request->tahun : $upload->tahun;
 
         $totalVal = 0;
         $count = count($request->kode_rekening);
@@ -147,18 +152,20 @@ class UploadController extends Controller
                 'opd_name' => $upload->opd_name,
                 'nilai' => $val,
                 'foto_bukti' => $upload->foto_bukti,
-                'periode' => $upload->periode,
-                'tahun' => $upload->tahun,
+                'periode' => $periode,
+                'tahun' => $tahun,
                 'tanggal_realisasi' => now()->toDateString(),
             ]);
         }
 
         // UPDATE STATUS TO 'Success'!
         $upload->update([
+            'periode' => $periode,
+            'tahun' => $tahun,
             'total_nilai' => $totalVal,
             'total_item' => $count,
             'status' => 'Success',
-            'keterangan' => 'Validasi berhasil & data telah tersimpan di database MySQL.',
+            'keterangan' => 'Validasi berhasil & data telah tersimpan di database.',
         ]);
 
         AuditLog::create([
