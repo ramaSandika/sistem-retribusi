@@ -67,17 +67,19 @@ class UploadController extends Controller
 
         $destinationPath = public_path('uploads');
         if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
+            @mkdir($destinationPath, 0777, true);
         }
+        @chmod($destinationPath, 0777);
 
         $fotoBuktiName = null;
         if (in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
             $fotoPath = public_path('uploads/foto_bukti');
             if (!file_exists($fotoPath)) {
-                mkdir($fotoPath, 0755, true);
+                @mkdir($fotoPath, 0777, true);
             }
+            @chmod($fotoPath, 0777);
             $fotoBuktiName = 'foto_' . $filename;
-            copy($file->getRealPath(), $fotoPath . '/' . $fotoBuktiName);
+            @copy($file->getRealPath(), $fotoPath . '/' . $fotoBuktiName);
         }
 
         $fullPath = $destinationPath . DIRECTORY_SEPARATOR . $filename;

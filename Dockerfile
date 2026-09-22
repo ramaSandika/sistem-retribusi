@@ -28,12 +28,13 @@ WORKDIR /var/www/html
 # Salin seluruh project
 COPY . /var/www/html
 
-# Pastikan direktori storage dan bootstrap/cache ada
+# Pastikan direktori storage, uploads, dan bootstrap/cache ada
 RUN mkdir -p /var/www/html/storage/framework/views \
              /var/www/html/storage/framework/sessions \
              /var/www/html/storage/framework/cache \
              /var/www/html/storage/logs \
-             /var/www/html/bootstrap/cache
+             /var/www/html/bootstrap/cache \
+             /var/www/html/public/uploads/foto_bukti
 
 # Install dependensi PHP tanpa menjalankan artisan script saat build
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
@@ -43,9 +44,9 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Berikan izin penuh ke storage dan bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Berikan izin penuh ke storage, public/uploads, dan bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/uploads \
+    && chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/uploads
 
 # Port default Apache
 EXPOSE 80
