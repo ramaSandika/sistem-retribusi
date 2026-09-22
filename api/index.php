@@ -2,8 +2,6 @@
 
 /**
  * Vercel Serverless Entry Point untuk Laravel
- * Env variables di-inject langsung agar tidak perlu
- * konfigurasi manual di Vercel Dashboard.
  */
 
 $envVars = [
@@ -16,11 +14,6 @@ $envVars = [
     'APP_LOCALE'           => 'en',
     'APP_FALLBACK_LOCALE'  => 'en',
     'APP_FAKER_LOCALE'     => 'en_US',
-    'APP_CONFIG_CACHE'     => '/tmp/config.php',
-    'APP_EVENTS_CACHE'     => '/tmp/events.php',
-    'APP_PACKAGES_CACHE'   => '/tmp/packages.php',
-    'APP_ROUTES_CACHE'     => '/tmp/routes.php',
-    'APP_SERVICES_CACHE'   => '/tmp/services.php',
     'VIEW_COMPILED_PATH'   => '/tmp',
     'SESSION_DRIVER'       => 'cookie',
     'SESSION_LIFETIME'     => '120',
@@ -44,7 +37,7 @@ foreach ($envVars as $key => $value) {
     }
 }
 
-// Paksa HTTPS di level PHP superglobals untuk reverse proxy Vercel
+// Paksa HTTPS di level PHP superglobals
 $_SERVER['HTTPS'] = 'on';
 $_SERVER['SERVER_PORT'] = 443;
 $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
