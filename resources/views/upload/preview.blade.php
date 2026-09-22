@@ -38,32 +38,32 @@
             </div>
         </div>
 
-        <div class="table-responsive mb-4 rounded-3" style="background: rgba(0,0,0,0.30); border: 1px solid rgba(255,255,255,0.15);">
-            <table class="table table-bordered align-middle" id="previewTable">
+        <div class="table-responsive mb-4 rounded-3" style="background: rgba(15, 5, 5, 0.65); border: 1.5px solid rgba(255,255,255,0.20);">
+            <table class="table align-middle" id="previewTable" style="background: transparent;">
                 <thead>
-                    <tr style="background: rgba(0,0,0,0.35);">
-                        <th style="width: 50px; color: #ffffff;">#</th>
-                        <th style="width: 220px; color: #ffffff;" class="small fw-bold">Kode Rekening</th>
-                        <th class="small fw-bold" style="color: #ffffff;">Nama Retribusi</th>
-                        <th style="width: 220px; color: #ffffff;" class="small fw-bold">Nilai Realisasi (Rp)</th>
-                        <th style="width: 60px; color: #ffffff;">Aksi</th>
+                    <tr style="background: rgba(0,0,0,0.50); border-bottom: 2px solid rgba(220,38,38,0.50);">
+                        <th style="width: 50px; color: #ffffff;" class="text-center py-3">#</th>
+                        <th style="width: 220px; color: #fca5a5;" class="fw-bold py-3">Kode Rekening</th>
+                        <th class="fw-bold py-3" style="color: #ffffff;">Nama Retribusi</th>
+                        <th style="width: 220px; color: #86efac;" class="fw-bold py-3">Nilai Realisasi (Rp)</th>
+                        <th style="width: 70px; color: #ffffff;" class="text-center py-3">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     @foreach($parsedItems as $index => $item)
-                        <tr>
+                        <tr style="background: transparent; border-bottom: 1px solid rgba(255,255,255,0.12);">
                             <td class="text-center fw-bold text-white index-col">{{ $index + 1 }}</td>
                             <td>
-                                <input type="text" name="kode_rekening[]" class="form-control form-control-sm rounded-3 fw-bold" value="{{ $item['kode'] }}" required>
+                                <input type="text" name="kode_rekening[]" class="form-control form-control-sm rounded-3 fw-bold bg-dark text-white border-secondary" value="{{ $item['kode'] }}" style="background: rgba(0,0,0,0.45) !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.30) !important;" required>
                             </td>
                             <td>
-                                <input type="text" name="nama_retribusi[]" class="form-control form-control-sm rounded-3" value="{{ $item['nama'] }}" required>
+                                <input type="text" name="nama_retribusi[]" class="form-control form-control-sm rounded-3 bg-dark text-white border-secondary" value="{{ $item['nama'] }}" style="background: rgba(0,0,0,0.45) !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.30) !important;" required>
                             </td>
                             <td>
-                                <input type="number" name="nilai[]" class="form-control form-control-sm rounded-3 fw-bold text-success value-input" value="{{ $item['nilai'] }}" oninput="updateTotal()" required>
+                                <input type="number" name="nilai[]" class="form-control form-control-sm rounded-3 fw-bold text-success value-input" value="{{ $item['nilai'] }}" oninput="updateTotal()" style="background: rgba(0,0,0,0.45) !important; color: #86efac !important; border: 1px solid rgba(255,255,255,0.30) !important; font-size: 1rem;" required>
                             </td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle p-1" onclick="removeRow(this)">
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle p-1" onclick="removeRow(this)" style="width: 32px; height: 32px;">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
@@ -71,9 +71,9 @@
                     @endforeach
                 </tbody>
                 <tfoot>
-                    <tr style="background: rgba(0,0,0,0.40);">
-                        <td colspan="3" class="fw-bold text-end text-white">Total Realisasi Extracted:</td>
-                        <td class="fw-bold text-danger fs-6" id="grandTotal">Rp {{ number_format(array_sum(array_column($parsedItems, 'nilai')), 0, ',', '.') }}</td>
+                    <tr style="background: rgba(0,0,0,0.60); border-top: 2px solid rgba(255,255,255,0.20);">
+                        <td colspan="3" class="fw-bold text-end text-white py-3 fs-6">Total Realisasi Extracted:</td>
+                        <td class="fw-bold text-success fs-5 py-3" id="grandTotal">Rp {{ number_format(array_sum(array_column($parsedItems, 'nilai')), 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
                 </tfoot>
