@@ -38,29 +38,32 @@
 
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="form-label fw-bold text-white mb-2">Periode / Bulan</label>
-                        <input type="text" name="periode" list="listPeriode" class="form-control rounded-3 border-danger-subtle" placeholder="Contoh: Semester 1, Juli 2025, dll" value="{{ old('periode', 'Semester 1') }}" required>
-                        <datalist id="listPeriode">
-                            <option value="Semester 1">
-                            <option value="Semester 2">
-                            <option value="Januari">
-                            <option value="Februari">
-                            <option value="Maret">
-                            <option value="April">
-                            <option value="Mei">
-                            <option value="Juni">
-                            <option value="Juli">
-                            <option value="Agustus">
-                            <option value="September">
-                            <option value="Oktober">
-                            <option value="November">
-                            <option value="Desember">
-                            <option value="Triwulan 1">
-                            <option value="Triwulan 2">
-                            <option value="Triwulan 3">
-                            <option value="Triwulan 4">
-                        </datalist>
-                        <small class="text-white-50" style="font-size: 0.72rem;">Bisa ketik periode/bulan apa saja</small>
+                        <label class="form-label fw-bold text-white mb-2">Pilihan Bulan / Periode</label>
+                        <select name="periode" class="form-select rounded-3 border-danger-subtle" required>
+                            <optgroup label="-- Pilihan Semester & Triwulan --">
+                                <option value="Semester 1" {{ old('periode') == 'Semester 1' ? 'selected' : '' }}>Semester 1 (Jan - Jun)</option>
+                                <option value="Semester 2" {{ old('periode') == 'Semester 2' ? 'selected' : '' }}>Semester 2 (Jul - Des)</option>
+                                <option value="Triwulan 1" {{ old('periode') == 'Triwulan 1' ? 'selected' : '' }}>Triwulan 1</option>
+                                <option value="Triwulan 2" {{ old('periode') == 'Triwulan 2' ? 'selected' : '' }}>Triwulan 2</option>
+                                <option value="Triwulan 3" {{ old('periode') == 'Triwulan 3' ? 'selected' : '' }}>Triwulan 3</option>
+                                <option value="Triwulan 4" {{ old('periode') == 'Triwulan 4' ? 'selected' : '' }}>Triwulan 4</option>
+                            </optgroup>
+                            <optgroup label="-- Pilihan Bulan Kalender (1 - 12) --">
+                                <option value="Januari" {{ old('periode') == 'Januari' ? 'selected' : '' }}>Januari</option>
+                                <option value="Februari" {{ old('periode') == 'Februari' ? 'selected' : '' }}>Februari</option>
+                                <option value="Maret" {{ old('periode') == 'Maret' ? 'selected' : '' }}>Maret</option>
+                                <option value="April" {{ old('periode') == 'April' ? 'selected' : '' }}>April</option>
+                                <option value="Mei" {{ old('periode') == 'Mei' ? 'selected' : '' }}>Mei</option>
+                                <option value="Juni" {{ old('periode', 'Juni') == 'Juni' ? 'selected' : '' }}>Juni</option>
+                                <option value="Juli" {{ old('periode') == 'Juli' ? 'selected' : '' }}>Juli</option>
+                                <option value="Agustus" {{ old('periode') == 'Agustus' ? 'selected' : '' }}>Agustus</option>
+                                <option value="September" {{ old('periode') == 'September' ? 'selected' : '' }}>September</option>
+                                <option value="Oktober" {{ old('periode') == 'Oktober' ? 'selected' : '' }}>Oktober</option>
+                                <option value="November" {{ old('periode') == 'November' ? 'selected' : '' }}>November</option>
+                                <option value="Desember" {{ old('periode') == 'Desember' ? 'selected' : '' }}>Desember</option>
+                            </optgroup>
+                        </select>
+                        <small class="text-white-50" style="font-size: 0.72rem;">Pilih bulan atau semester yang sesuai</small>
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-bold text-white mb-2">Tahun Anggaran</label>

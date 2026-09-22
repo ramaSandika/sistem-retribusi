@@ -75,27 +75,51 @@ class PdfParserService
                         $trimmed = trim($line);
                         if (empty($trimmed)) continue;
 
-                        // Deteksi pola Kode Rekening seperti: 4.1.01.09.01 atau 4.1.02.01.01 atau 4.1.4.55.3
-                        if (preg_match('/^(4\.\d+(\.\d+)+)\s+(.*)$/i', $trimmed, $matches)) {
+                        // Deteksi pola Kode Rekening seperti: 4.1.01.09.01 atau 4.1.02.01.01 atau 4.2.01.09
+                        if (preg_match('/^(4\.\d+(?:\.\d+)+)\s+(.*)$/i', $trimmed, $matches)) {
                             $code = trim($matches[1]);
-                            $rest = trim($matches[3]);
+                            $rest = trim($matches[2]);
 
-                            // Filter: jika hanya kode induk 1-2 digit titik (contoh '4', '4.1'), lewati karena induk konsolidasi
+                            // Filter: jika hanya kode induk 1-2 digit titik (contoh '4', '4.1', '4.2', '4.3'), lewati karena header grup
                             $parts = explode('.', $code);
                             if (count($parts) < 3) {
                                 continue;
                             }
 
-                            // Ekstrak angka nilai di bagian belakang teks baris
-                            // Format rupiah Indonesia: 642.208.125,00 atau 642.208.125
-                            if (preg_match('/([\d\.]+,\d{2}|\b[\d\.]{5,}\b)(?!.*\d)/', $rest, $numMatch)) {
+                            // Temukan semua format angka uang di ujung teks (format: 133.171.407.000,00 atau 0,00)
+                            // Kolom standar LRA: [ANGGARAN 2025] [REALISASI 2025] [% 2025] [REALISASI 2024]
+                            preg_match_all('/(?<=\s|^)(\d{1,3}(?:\.\d{3})*(?:,\d{2})|\d+,\d{2})(?=\s|$)/', $rest, $numMatches);
+
+                            if (!empty($numMatches[0]) && count($numMatches[0]) >= 2) {
+                                $matchedNums = $numMatches[0];
+                                $countNums = count($matchedNums);
+
+                                // Realisasi berjalan adalah kolom ke-2 dari angka yang ditemukan:
+                                // Misal: [Anggaran, Realisasi, Persen, Realisasi_Lalu] -> ambil Realisasi (index 1)
+                                // Jika hanya ada 2 angka: [Anggaran, Realisasi] -> ambil index 1
+                                $realisasiStr = ($countNums >= 3) ? $matchedNums[1] : $matchedNums[$countNums - 1];
+                                $rawVal = str_replace('.', '', explode(',', $realisasiStr)[0]);
+                                $numericVal = (float) $rawVal;
+
+                                // Nama uraian adalah bagian sebelum deretan angka pertama
+                                $firstNumPos = strpos($rest, $matchedNums[0]);
+                                $nama = ($firstNumPos !== false) ? substr($rest, 0, $firstNumPos) : $rest;
+                                $nama = trim($nama);
+
+                                if ($numericVal > 0 && !empty($nama)) {
+                                    $items[] = [
+                                        'kode' => $code,
+                                        'nama' => $nama,
+                                        'nilai' => $numericVal,
+                                    ];
+                                }
+                            } elseif (preg_match('/([\d\.]+,\d{2}|\b[\d\.]{5,}\b)(?!.*\d)/', $rest, $numMatch)) {
                                 $valStr = $numMatch[1];
                                 $rawVal = str_replace('.', '', explode(',', $valStr)[0]);
                                 $numericVal = (float) $rawVal;
 
-                                $nama = trim(str_replace($valStr, '', $rest));
-                                // Bersihkan kolom persentase atau sisa uraian
-                                $nama = preg_replace('/\s+[\d\.\,]+\s*$/', '', $nama);
+                                $firstPos = strpos($rest, $valStr);
+                                $nama = ($firstPos !== false) ? substr($rest, 0, $firstPos) : $rest;
                                 $nama = trim($nama);
 
                                 if ($numericVal > 0 && !empty($nama)) {
@@ -106,7 +130,6 @@ class PdfParserService
                                     ];
                                 }
                             } else {
-                                // Baris yang mungkin memuat nama uraian yang berlanjut ke baris berikutnya
                                 $currentCode = $code;
                                 $currentName = $rest;
                             }
