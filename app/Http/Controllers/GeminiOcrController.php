@@ -45,40 +45,58 @@ class GeminiOcrController extends Controller
             $isPdf = str_contains($mimeType, 'pdf');
             $imagePreview = $isPdf ? null : ('data:' . $mimeType . ';base64,' . $base64Image);
 
-            $promptText = "Ekstrak semua informasi penting, tabel, angka, dan teks dari dokumen/gambar ini dan kembalikan dalam format JSON terstruktur yang rapi.";
+            $promptText = "Ekstrak semua informasi penting, tabel, angka, dan teks dari dokumen/berkas ini dan kembalikan dalam format JSON terstruktur yang rapi.";
 
-            // Model Gemini (Gunakan gemini-3.6-flash terbaru yang didukung API key)
-            $model = env('GEMINI_MODEL', 'gemini-3.6-flash');
-            $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+            // Daftar model yang didukung secara berurutan jika salah satu sedang sibuk (high demand / 503)
+            $candidateModels = array_unique(array_filter([
+                env('GEMINI_MODEL'),
+                'gemini-3.5-flash',
+                'gemini-3.6-flash',
+                'gemini-3.5-flash-lite',
+                'gemini-3.7-flash',
+            ]));
 
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->timeout(60)->post($endpoint, [
-                'contents' => [
-                    [
-                        'parts' => [
-                            [
-                                'text' => $promptText
-                            ],
-                            [
-                                'inline_data' => [
-                                    'mime_type' => $mimeType,
-                                    'data' => $base64Image,
+            $response = null;
+            $lastErrorMessage = 'Gagal menghubungi Google Gemini API.';
+
+            foreach ($candidateModels as $model) {
+                $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+                $res = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                ])->timeout(90)->post($endpoint, [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                [
+                                    'text' => $promptText
+                                ],
+                                [
+                                    'inline_data' => [
+                                        'mime_type' => $mimeType,
+                                        'data' => $base64Image,
+                                    ]
                                 ]
                             ]
                         ]
+                    ],
+                    'generationConfig' => [
+                        'temperature' => 0.2,
                     ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.2,
-                ]
-            ]);
+                ]);
 
-            if ($response->failed()) {
-                $errorBody = $response->json();
-                $errorMessage = $errorBody['error']['message'] ?? 'Gagal menghubungi Google Gemini API.';
-                Log::error('Gemini OCR API Error: ' . json_encode($errorBody));
-                return back()->with('error', 'Gemini API Error: ' . $errorMessage)->with('imagePreview', $imagePreview);
+                if ($res->successful()) {
+                    $response = $res;
+                    break;
+                } else {
+                    $errData = $res->json();
+                    $lastErrorMessage = $errData['error']['message'] ?? ('HTTP ' . $res->status());
+                    Log::warning("Gemini model {$model} gagal: {$lastErrorMessage}. Mencoba model cadangan berikutnya...");
+                }
+            }
+
+            if (!$response) {
+                return back()->with('error', 'Semua server AI Gemini saat ini sedang sibuk (High Demand). Silakan coba 1-2 menit lagi: ' . $lastErrorMessage)->with('imagePreview', $imagePreview);
             }
 
             $resultData = $response->json();
