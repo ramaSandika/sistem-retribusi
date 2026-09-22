@@ -16,46 +16,56 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Users
-        $admin = User::create([
-            'name' => 'Administrator BAPENDA',
-            'email' => 'admin@retribusi.go.id',
-            'password' => Hash::make('password123'),
-            'role' => 'admin',
-            'opd_name' => 'Badan Pendapatan Daerah',
-        ]);
+        // 1. Create Users (firstOrCreate agar aman dijalankan berulang kali)
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@retribusi.go.id'],
+            [
+                'name' => 'Administrator BAPENDA',
+                'password' => Hash::make('password123'),
+                'role' => 'admin',
+                'opd_name' => 'Badan Pendapatan Daerah',
+            ]
+        );
 
-        $userDishub = User::create([
-            'name' => 'Operator Dishub',
-            'email' => 'dishub@retribusi.go.id',
-            'password' => Hash::make('password123'),
-            'role' => 'user_opd',
-            'opd_name' => 'Dinas Perhubungan',
-        ]);
+        $userDishub = User::firstOrCreate(
+            ['email' => 'dishub@retribusi.go.id'],
+            [
+                'name' => 'Operator Dishub',
+                'password' => Hash::make('password123'),
+                'role' => 'user_opd',
+                'opd_name' => 'Dinas Perhubungan',
+            ]
+        );
 
-        $userDisdag = User::create([
-            'name' => 'Operator Disdag',
-            'email' => 'disdag@retribusi.go.id',
-            'password' => Hash::make('password123'),
-            'role' => 'user_opd',
-            'opd_name' => 'Dinas Perdagangan',
-        ]);
+        $userDisdag = User::firstOrCreate(
+            ['email' => 'disdag@retribusi.go.id'],
+            [
+                'name' => 'Operator Disdag',
+                'password' => Hash::make('password123'),
+                'role' => 'user_opd',
+                'opd_name' => 'Dinas Perdagangan',
+            ]
+        );
 
-        $userPerkim = User::create([
-            'name' => 'Operator Perkim',
-            'email' => 'perkim@retribusi.go.id',
-            'password' => Hash::make('password123'),
-            'role' => 'user_opd',
-            'opd_name' => 'Dinas Perkim',
-        ]);
+        $userPerkim = User::firstOrCreate(
+            ['email' => 'perkim@retribusi.go.id'],
+            [
+                'name' => 'Operator Perkim',
+                'password' => Hash::make('password123'),
+                'role' => 'user_opd',
+                'opd_name' => 'Dinas Perkim',
+            ]
+        );
 
-        $userDinkes = User::create([
-            'name' => 'Operator Dinkes',
-            'email' => 'dinkes@retribusi.go.id',
-            'password' => Hash::make('password123'),
-            'role' => 'user_opd',
-            'opd_name' => 'Dinas Kesehatan',
-        ]);
+        $userDinkes = User::firstOrCreate(
+            ['email' => 'dinkes@retribusi.go.id'],
+            [
+                'name' => 'Operator Dinkes',
+                'password' => Hash::make('password123'),
+                'role' => 'user_opd',
+                'opd_name' => 'Dinas Kesehatan',
+            ]
+        );
 
         // 2. Sample Data Realisasi Retribusi 2026
         $seedData = [
@@ -79,8 +89,9 @@ class DatabaseSeeder extends Seeder
             ['upload_user' => $userDinkes, 'opd' => 'Dinas Kesehatan', 'kode' => '4.1.02.05.01', 'nama' => 'Retribusi Pelayanan Puskesmas & Labkesda', 'nilai' => 78400000, 'periode' => 'Agustus 2026', 'tahun' => 2026],
         ];
 
-        // Group into sample Upload Header records
-        $uploadDishub = UploadRetribusi::create([
+        // 2. Sample Data Realisasi Retribusi 2026 (hanya jika tabel masih kosong)
+        if (UploadRetribusi::count() === 0) {
+            $uploadDishub = UploadRetribusi::create([
             'user_id' => $userDishub->id,
             'filename' => 'REKAP_RETRIBUSI_DISHUB_AUG2026.pdf',
             'original_filename' => 'Realisasi_Dishub_Agustus_2026.pdf',
@@ -144,5 +155,6 @@ class DatabaseSeeder extends Seeder
             'details' => 'Memvalidasi data realisasi retribusi pasar periode Agustus 2026',
             'ip_address' => '127.0.0.1',
         ]);
+        }
     }
 }

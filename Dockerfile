@@ -44,5 +44,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Port default Apache
 EXPOSE 80
 
-# Jalankan package discovery, migrasi, seed akun default, dan nyalakan Apache saat container jalan
-CMD php artisan package:discover --ansi && php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && apache2-foreground
+# Start Apache langsung dan jalankan migrasi & seeder di background agar server instan aktif
+CMD php artisan package:discover --ansi && php artisan config:clear && (php artisan migrate --force && php artisan db:seed --force &) && apache2-foreground
