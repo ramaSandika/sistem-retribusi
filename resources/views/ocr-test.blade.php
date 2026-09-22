@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'OCR Dokumen & PDF Gemini AI')
 @section('page_heading', 'Ekstraksi Cerdas Gemini AI')
@@ -15,7 +15,7 @@
                     </div>
                     <div>
                         <h5 class="fw-bold mb-0 text-white">Ekstraksi Dokumen & PDF</h5>
-                        <small class="text-white-50">Didukung oleh Google Gemini 1.5 Flash</small>
+                        <small class="text-white-50">Didukung oleh Google Gemini AI</small>
                     </div>
                 </div>
 

@@ -47,8 +47,9 @@ class GeminiOcrController extends Controller
 
             $promptText = "Ekstrak semua informasi penting, tabel, angka, dan teks dari dokumen/gambar ini dan kembalikan dalam format JSON terstruktur yang rapi.";
 
-            // Endpoint Gemini 1.5 Flash
-            $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
+            // Model Gemini (Gunakan gemini-3.6-flash terbaru yang didukung API key)
+            $model = env('GEMINI_MODEL', 'gemini-3.6-flash');
+            $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -100,7 +101,7 @@ class GeminiOcrController extends Controller
                 'imagePreview' => $imagePreview,
                 'isPdf' => $isPdf,
                 'originalFilename' => $file->getClientOriginalName(),
-            ])->with('success', 'Dokumen/Gambar berhasil diproses dan diekstrak oleh Gemini 1.5 Flash!');
+            ])->with('success', 'Dokumen/Berkas berhasil diproses dan diekstrak oleh Google Gemini AI!');
 
         } catch (\Exception $e) {
             Log::error('Gemini OCR Exception: ' . $e->getMessage());
