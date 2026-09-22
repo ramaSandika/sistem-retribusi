@@ -22,12 +22,12 @@ class GeminiOcrController extends Controller
     public function process(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
+            'image' => 'required|file|mimes:jpeg,png,jpg,webp,pdf|max:20480',
         ], [
-            'image.required' => 'Silakan pilih gambar terlebih dahulu.',
-            'image.image' => 'File yang diunggah harus berupa gambar.',
-            'image.mimes' => 'Format gambar yang didukung: JPG, JPEG, PNG, WEBP.',
-            'image.max' => 'Ukuran gambar maksimal adalah 10 MB.',
+            'image.required' => 'Silakan pilih berkas dokumen atau gambar terlebih dahulu.',
+            'image.file' => 'Berkas yang diunggah tidak valid.',
+            'image.mimes' => 'Format yang didukung: PDF, JPG, JPEG, PNG, WEBP.',
+            'image.max' => 'Ukuran berkas maksimal adalah 20 MB.',
         ]);
 
         $apiKey = config('services.gemini.api_key');
@@ -41,10 +41,11 @@ class GeminiOcrController extends Controller
             $mimeType = $file->getMimeType();
             $base64Image = base64_encode(file_get_contents($file->getRealPath()));
 
-            // Data URI untuk preview gambar di view
-            $imagePreview = 'data:' . $mimeType . ';base64,' . $base64Image;
+            // Data URI untuk preview gambar di view (jika bukan PDF)
+            $isPdf = str_contains($mimeType, 'pdf');
+            $imagePreview = $isPdf ? null : ('data:' . $mimeType . ';base64,' . $base64Image);
 
-            $promptText = "Ekstrak teks dari gambar ini dan kembalikan dalam format terstruktur JSON.";
+            $promptText = "Ekstrak semua informasi penting, tabel, angka, dan teks dari dokumen/gambar ini dan kembalikan dalam format JSON terstruktur yang rapi.";
 
             // Endpoint Gemini 1.5 Flash
             $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
@@ -97,8 +98,9 @@ class GeminiOcrController extends Controller
                 'jsonResult' => $parsedJson,
                 'isJson' => !is_null($parsedJson),
                 'imagePreview' => $imagePreview,
+                'isPdf' => $isPdf,
                 'originalFilename' => $file->getClientOriginalName(),
-            ])->with('success', 'Gambar berhasil diproses oleh Gemini 1.5 Flash!');
+            ])->with('success', 'Dokumen/Gambar berhasil diproses dan diekstrak oleh Gemini 1.5 Flash!');
 
         } catch (\Exception $e) {
             Log::error('Gemini OCR Exception: ' . $e->getMessage());
