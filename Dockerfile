@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install ekstensi sistem dan database yang dibutuhkan Laravel
+# Install dependensi sistem dan ekstensi database yang dibutuhkan Laravel
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -22,8 +22,8 @@ WORKDIR /var/www/html
 # Salin seluruh project
 COPY . /var/www/html
 
-# Install dependensi PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install dependensi PHP tanpa menjalankan artisan script saat build
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Konfigurasi Apache DocumentRoot ke folder public Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -37,5 +37,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Port default Apache
 EXPOSE 80
 
-# Script start yang otomatis jalankan migrasi database saat booting
-CMD php artisan config:clear && php artisan migrate --force && apache2-foreground
+# Jalankan package discovery, migrasi, dan nyalakan Apache saat container jalan
+CMD php artisan package:discover --ansi && php artisan config:clear && php artisan migrate --force && apache2-foreground
