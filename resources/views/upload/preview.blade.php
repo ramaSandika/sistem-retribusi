@@ -67,15 +67,15 @@
             </table>
         </div>
 
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-3" onclick="addRow()">
-                <i class="fas fa-plus me-1"></i> Tambah Baris Manual
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-2">
+            <button type="button" class="btn btn-outline-light rounded-3 px-3 py-2 fw-semibold" onclick="addRow()">
+                <i class="fas fa-plus text-danger me-1"></i> Tambah Baris Manual
             </button>
 
             <div class="d-flex gap-2">
-                <a href="{{ route('upload.index') }}" class="btn btn-light border fw-semibold">Batalkan</a>
-                <button type="submit" class="btn btn-red fw-bold shadow-sm">
-                    <i class="fas fa-database me-2"></i> Simpan ke Database MySQL
+                <a href="{{ route('upload.index') }}" class="btn btn-outline-light px-4 py-2 fw-semibold">Batalkan</a>
+                <button type="submit" class="btn btn-red px-4 py-2 fw-bold shadow">
+                    <i class="fas fa-floppy-disk me-2"></i> Konfirmasi & Simpan ke Database
                 </button>
             </div>
         </div>
