@@ -255,7 +255,7 @@
                 <small style="color:rgba(255,255,255,0.55);">Silakan masukkan identitas akun resmi Anda</small>
             </div>
 
-            <form action="{{ route('login') }}" method="POST">
+            <form action="/login" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Email / Username Resmi</label>

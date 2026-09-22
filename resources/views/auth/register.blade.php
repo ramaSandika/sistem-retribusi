@@ -68,7 +68,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('register') }}" method="POST">
+            <form action="/register" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label fw-semibold small text-muted">Nama Lengkap Operator</label>
