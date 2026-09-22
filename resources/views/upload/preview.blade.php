@@ -5,41 +5,41 @@
 
 @section('content')
 <div class="card-custom p-4 mb-4 border-danger border-2" style="border-style: dashed !important;">
-    <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+    <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom border-white-10">
         <div>
-            <h6 class="fw-bold text-danger mb-1">
-                <i class="fas fa-clipboard-check me-2"></i> Hasil Pembacaan Parser PDF: {{ $upload->original_filename }}
+            <h6 class="fw-bold text-white mb-1">
+                <i class="fas fa-clipboard-check me-2 text-danger"></i> Hasil Pembacaan Parser PDF: {{ $upload->original_filename }}
             </h6>
-            <small class="text-muted">Instansi: <strong>{{ $opd_name }}</strong> | Periode: <strong>{{ $periode }} {{ $tahun }}</strong></small>
+            <small class="text-white-50">Instansi: <strong class="text-white">{{ $opd_name }}</strong> | Periode: <strong class="text-white">{{ $periode }} {{ $tahun }}</strong></small>
         </div>
         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
             <i class="fas fa-edit me-1"></i> Mode Validasi (Dapat Diedit)
         </span>
     </div>
 
-    <div class="alert alert-danger-subtle border border-danger-subtle text-danger rounded-3 small mb-4">
-        <i class="fas fa-triangle-exclamation me-1"></i> Periksa kembali data hasil ekstraksi di bawah ini. Jika ada angka/kode yang salah terbaca, silakan ubah langsung pada kolom sebelum disimpan ke database MySQL.
+    <div class="alert alert-danger-subtle border border-danger-subtle rounded-3 small mb-4" style="background: rgba(220,38,38,0.20); color: #fecaca;">
+        <i class="fas fa-triangle-exclamation me-1"></i> Periksa kembali data hasil ekstraksi di bawah ini. Jika ada angka/kode yang salah terbaca, silakan ubah langsung pada kolom sebelum disimpan ke database.
     </div>
 
     <form action="{{ route('upload.save') }}" method="POST" id="validationForm">
         @csrf
         <input type="hidden" name="upload_id" value="{{ $upload->id }}">
 
-        <div class="table-responsive mb-4">
+        <div class="table-responsive mb-4 rounded-3" style="background: rgba(0,0,0,0.30); border: 1px solid rgba(255,255,255,0.15);">
             <table class="table table-bordered align-middle" id="previewTable">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 50px;">#</th>
-                        <th style="width: 220px;" class="small text-muted fw-bold">Kode Rekening</th>
-                        <th class="small text-muted fw-bold">Nama Retribusi</th>
-                        <th style="width: 220px;" class="small text-muted fw-bold">Nilai Realisasi (Rp)</th>
-                        <th style="width: 60px;">Aksi</th>
+                <thead>
+                    <tr style="background: rgba(0,0,0,0.35);">
+                        <th style="width: 50px; color: #ffffff;">#</th>
+                        <th style="width: 220px; color: #ffffff;" class="small fw-bold">Kode Rekening</th>
+                        <th class="small fw-bold" style="color: #ffffff;">Nama Retribusi</th>
+                        <th style="width: 220px; color: #ffffff;" class="small fw-bold">Nilai Realisasi (Rp)</th>
+                        <th style="width: 60px; color: #ffffff;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     @foreach($parsedItems as $index => $item)
                         <tr>
-                            <td class="text-center fw-bold text-muted index-col">{{ $index + 1 }}</td>
+                            <td class="text-center fw-bold text-white index-col">{{ $index + 1 }}</td>
                             <td>
                                 <input type="text" name="kode_rekening[]" class="form-control form-control-sm rounded-3 fw-bold" value="{{ $item['kode'] }}" required>
                             </td>
@@ -57,9 +57,9 @@
                         </tr>
                     @endforeach
                 </tbody>
-                <tfoot class="table-light">
-                    <tr>
-                        <td colspan="3" class="fw-bold text-end">Total Realisasi Extracted:</td>
+                <tfoot>
+                    <tr style="background: rgba(0,0,0,0.40);">
+                        <td colspan="3" class="fw-bold text-end text-white">Total Realisasi Extracted:</td>
                         <td class="fw-bold text-danger fs-6" id="grandTotal">Rp {{ number_format(array_sum(array_column($parsedItems, 'nilai')), 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
