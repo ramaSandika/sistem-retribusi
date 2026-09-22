@@ -467,6 +467,12 @@
                 <i class="fas fa-history"></i> Audit Trail Log
             </a>
             @endif
+            <a href="{{ route('ocr.index') }}"
+               class="d-flex align-items-center gap-3 px-4 py-3 text-white text-decoration-none fw-600
+                      {{ request()->routeIs('ocr.*') ? 'bg-white bg-opacity-10 rounded-3 mx-2' : '' }}"
+               style="font-size:0.90rem;">
+                <i class="fas fa-wand-magic-sparkles"></i> OCR Gemini AI
+            </a>
             <hr style="border-color:rgba(255,255,255,0.10); margin: 8px 16px;">
             <form action="{{ route('logout') }}" method="POST" class="px-3 pb-4">
                 @csrf
@@ -524,6 +530,11 @@
             <i class="fas fa-history"></i> Audit Log
         </a>
         @endif
+
+        <a href="{{ route('ocr.index') }}"
+           class="nav-link {{ request()->routeIs('ocr.*') ? 'active' : '' }}">
+            <i class="fas fa-wand-magic-sparkles"></i> OCR Gemini AI
+        </a>
 
         <!-- User info bottom -->
         <div class="position-absolute bottom-0 start-0 w-100 p-3"

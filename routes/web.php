@@ -9,6 +9,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MasterRetribusiController;
+use App\Http\Controllers\GeminiOcrController;
 use App\Http\Middleware\EnsureIsAdmin;
 
 // Public Guest Routes
@@ -60,4 +61,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
     });
+
+    // Uji Coba OCR Google Gemini 1.5 Flash (Modular & Terpisah)
+    Route::get('/ocr-test', [GeminiOcrController::class, 'index'])->name('ocr.index');
+    Route::post('/ocr-test', [GeminiOcrController::class, 'process'])->name('ocr.process');
 });
