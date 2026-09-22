@@ -66,3 +66,31 @@ Route::middleware('auth')->group(function () {
     Route::get('/ocr-test', [GeminiOcrController::class, 'index'])->name('ocr.index');
     Route::post('/ocr-test', [GeminiOcrController::class, 'process'])->name('ocr.process');
 });
+
+// Endpoint untuk Migrasi & Seed Database Otomatis di Vercel (sekali jalan)
+Route::get('/setup-db-init', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate --force');
+        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        \Illuminate\Support\Facades\Artisan::call('db:seed --force');
+        $seedOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database berhasil dimigrasi dan di-seed!',
+            'migrate' => $migrateOutput,
+            'seed' => $seedOutput,
+            'admin_login' => [
+                'email' => 'admin@retribusi.go.id',
+                'password' => 'password123'
+            ]
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
