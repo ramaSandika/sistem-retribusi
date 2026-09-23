@@ -22,12 +22,12 @@ class GeminiOcrController extends Controller
     public function process(Request $request)
     {
         $request->validate([
-            'image' => 'required|file|mimes:jpeg,png,jpg,webp,pdf|max:20480',
+            'image' => 'required|file|mimes:jpeg,png,jpg,webp,pdf|max:30720',
         ], [
             'image.required' => 'Silakan pilih berkas dokumen atau gambar terlebih dahulu.',
             'image.file' => 'Berkas yang diunggah tidak valid.',
             'image.mimes' => 'Format yang didukung: PDF, JPG, JPEG, PNG, WEBP.',
-            'image.max' => 'Ukuran berkas maksimal adalah 20 MB.',
+            'image.max' => 'Ukuran berkas maksimal adalah 30 MB.',
         ]);
 
         $apiKey = config('services.gemini.api_key');
