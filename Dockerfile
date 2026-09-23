@@ -16,8 +16,9 @@ RUN apt-get update && apt-get install -y \
 # Konfigurasi batas upload PHP untuk file PDF/Dokumen besar
 RUN echo "upload_max_filesize = 32M" > /usr/local/etc/php/conf.d/uploads.ini \
     && echo "post_max_size = 36M" >> /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "max_execution_time = 120" >> /usr/local/etc/php/conf.d/uploads.ini
+    && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "default_socket_timeout = 180" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

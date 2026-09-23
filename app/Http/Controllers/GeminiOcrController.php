@@ -45,8 +45,6 @@ class GeminiOcrController extends Controller
             $isPdf = str_contains($mimeType, 'pdf');
             $imagePreview = $isPdf ? null : ('data:' . $mimeType . ';base64,' . $base64Image);
 
-            $promptText = "Ekstrak semua informasi penting, tabel, angka, dan teks dari dokumen/berkas ini dan kembalikan dalam format JSON terstruktur yang rapi.";
-
             // Daftar model yang didukung secara berurutan jika salah satu sedang sibuk (high demand / 503)
             $candidateModels = array_unique(array_filter([
                 env('GEMINI_MODEL'),
@@ -56,42 +54,55 @@ class GeminiOcrController extends Controller
                 'gemini-3.7-flash',
             ]));
 
+            $promptText = "Ekstrak ringkasan tabel dan data penting dari dokumen/berkas ini ke dalam format JSON objek sederhana.";
+
             $response = null;
             $lastErrorMessage = 'Gagal menghubungi Google Gemini API.';
 
             foreach ($candidateModels as $model) {
                 $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-                $res = Http::withHeaders([
-                    'Content-Type' => 'application/json',
-                ])->timeout(90)->post($endpoint, [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                [
-                                    'text' => $promptText
-                                ],
-                                [
-                                    'inline_data' => [
-                                        'mime_type' => $mimeType,
-                                        'data' => $base64Image,
+                try {
+                    $res = Http::withHeaders([
+                        'Content-Type' => 'application/json',
+                    ])->timeout(120)->connectTimeout(15)->post($endpoint, [
+                        'contents' => [
+                            [
+                                'parts' => [
+                                    [
+                                        'text' => $promptText
+                                    ],
+                                    [
+                                        'inline_data' => [
+                                            'mime_type' => $mimeType,
+                                            'data' => $base64Image,
+                                        ]
                                     ]
                                 ]
                             ]
+                        ],
+                        'generationConfig' => [
+                            'temperature' => 0.1,
+                            'maxOutputTokens' => 4096,
                         ]
-                    ],
-                    'generationConfig' => [
-                        'temperature' => 0.2,
-                    ]
-                ]);
+                    ]);
 
-                if ($res->successful()) {
-                    $response = $res;
-                    break;
-                } else {
-                    $errData = $res->json();
-                    $lastErrorMessage = $errData['error']['message'] ?? ('HTTP ' . $res->status());
-                    Log::warning("Gemini model {$model} gagal: {$lastErrorMessage}. Mencoba model cadangan berikutnya...");
+                    if ($res->successful()) {
+                        $response = $res;
+                        break;
+                    } else {
+                        $errData = $res->json();
+                        $lastErrorMessage = $errData['error']['message'] ?? ('HTTP ' . $res->status());
+                        Log::warning("Gemini model {$model} gagal: {$lastErrorMessage}. Mencoba model cadangan berikutnya...");
+                    }
+                } catch (\Illuminate\Http\Client\ConnectionException $ce) {
+                    $lastErrorMessage = "Timeout saat menghubungi model {$model}.";
+                    Log::warning("Gemini model {$model} timeout: " . $ce->getMessage());
+                    continue;
+                } catch (\Exception $ex) {
+                    $lastErrorMessage = $ex->getMessage();
+                    Log::warning("Gemini model {$model} error: " . $ex->getMessage());
+                    continue;
                 }
             }
 
