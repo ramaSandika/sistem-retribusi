@@ -222,26 +222,44 @@
             font-size: 24px;
         }
 
-        /* ===== TABLE GLASS (HURUF LEBIH BESAR, PADDING NYAMAN) ===== */
-        .table { color: #ffffff; font-size: 0.95rem; margin-bottom: 0; }
+        /* ===== TABLE GLASS (HURUF LEBIH BESAR, PADDING NYAMAN, BEBAS DARI BOOTSTRAP WHITE OVERLAY) ===== */
+        .table {
+            --bs-table-bg: transparent !important;
+            --bs-table-color: #ffffff !important;
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.08) !important;
+            --bs-table-hover-color: #ffffff !important;
+            color: #ffffff !important;
+            background-color: transparent !important;
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        .table > :not(caption) > * > * {
+            background-color: transparent !important;
+            color: #ffffff !important;
+            border-bottom-color: rgba(255, 255, 255, 0.12);
+        }
         .table th {
-            color: #ffffff;
+            color: #ffffff !important;
             font-size: 0.88rem;
             font-weight: 800;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            border-bottom: 2px solid rgba(255,255,255,0.22);
+            border-bottom: 2px solid rgba(220, 38, 38, 0.50) !important;
             padding: 14px 16px;
-            background: rgba(0, 0, 0, 0.20);
+            background: rgba(0, 0, 0, 0.40) !important;
         }
         .table td {
-            border-color: rgba(255,255,255,0.10);
+            border-color: rgba(255, 255, 255, 0.10) !important;
             vertical-align: middle;
             padding: 14px 16px;
-            color: rgba(255,255,255,0.95);
+            color: rgba(255, 255, 255, 0.95) !important;
         }
-        .table-hover tbody tr:hover { background: rgba(255,255,255,0.10); }
-        .table-light thead tr { background: transparent !important; }
+        .table-hover tbody tr:hover { background: rgba(255,255,255,0.10) !important; }
+        .table-light, .table-light thead tr, .table-light th, .table-light td {
+            background: transparent !important;
+            --bs-table-bg: transparent !important;
+            color: #ffffff !important;
+        }
 
         /* ===== FORM CONTROLS GLASS (RAMAH DIKLIK & DIBACA) ===== */
         .form-control, .form-select {

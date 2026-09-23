@@ -155,25 +155,25 @@
                         <!-- Tab 1: Tabel / Data Terstruktur -->
                         <div class="tab-pane fade show active" id="pills-parsed" role="tabpanel">
                             @if($isJson && is_array($jsonResult))
-                                <div class="table-responsive rounded-3" style="background: rgba(0,0,0,0.30); border: 1px solid rgba(255,255,255,0.15);">
-                                    <table class="table table-hover align-middle mb-0">
+                                <div class="table-responsive rounded-3" style="background: rgba(15, 5, 5, 0.70); border: 1.5px solid rgba(255,255,255,0.20);">
+                                    <table class="table align-middle mb-0" style="background: transparent;">
                                         <thead>
-                                            <tr>
-                                                <th style="width: 35%; color: #fca5a5;">Bidang / Kolom</th>
-                                                <th style="color: #ffffff;">Nilai Ekstraksi</th>
+                                            <tr style="background: rgba(0,0,0,0.60); border-bottom: 2px solid rgba(220,38,38,0.50);">
+                                                <th style="width: 35%; color: #fca5a5 !important;" class="py-3 px-3 fw-bold">Bidang / Kolom</th>
+                                                <th style="color: #ffffff !important;" class="py-3 px-3 fw-bold">Nilai Ekstraksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($jsonResult as $key => $val)
-                                                <tr>
-                                                    <td class="fw-bold text-white small" style="vertical-align: top;">
+                                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.25);">
+                                                    <td class="fw-bold text-white small px-3 py-3" style="vertical-align: top; color: #ffffff !important;">
                                                         <i class="fas fa-caret-right text-danger me-1"></i> {{ ucwords(str_replace('_', ' ', $key)) }}
                                                     </td>
-                                                    <td class="small text-white">
+                                                    <td class="small px-3 py-3" style="color: #ffffff !important;">
                                                         @if(is_array($val))
-                                                            <pre class="mb-0 p-2 rounded small text-white" style="background: rgba(255,255,255,0.08); font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.10); max-height: 250px; overflow-y: auto;">{{ json_encode($val, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                            <pre class="mb-0 p-2 rounded small text-white" style="background: rgba(0,0,0,0.50); font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.15); max-height: 250px; overflow-y: auto; color: #ffffff !important;">{{ json_encode($val, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
                                                         @else
-                                                            <span class="fw-semibold">{{ $val }}</span>
+                                                            <span class="fw-semibold text-white" style="color: #ffffff !important; font-size: 0.95rem;">{{ $val }}</span>
                                                         @endif
                                                     </td>
                                                 </tr>
