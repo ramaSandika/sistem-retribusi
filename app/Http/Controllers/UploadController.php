@@ -39,7 +39,7 @@ class UploadController extends Controller
             'opd_name' => 'required|string',
             'periode' => 'required|string',
             'tahun' => 'required|integer',
-            'file_upload' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:10240',
+            'file_upload' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:30720',
         ]);
 
         $user = Auth::user();
