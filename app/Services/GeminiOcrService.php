@@ -11,11 +11,12 @@ class GeminiOcrService {
 
     public function __construct() {
         $this->apiKey = config('services.gemini.api_key') ?? env('GEMINI_API_KEY', '');
-        // Prioritas model yang terbukti aktif di akun Anda
+        // Model Gemini resmi yang mendukung multimodal PDF
         $this->fallbackModels = [
-            'gemini-3.5-flash',
-            'gemini-3.1-flash-lite',
-            'gemini-3.8-flash'
+            'gemini-2.0-flash',        // Paling cepat & akurat
+            'gemini-1.5-flash',        // Fallback 1
+            'gemini-1.5-flash-8b',     // Fallback 2 (lebih ringan)
+            'gemini-1.5-pro',          // Fallback 3
         ];
     }
 
@@ -97,9 +98,21 @@ PROMPT;
                 }
 
                 $status = $response->status();
-                $msg = $response->json('error.message') ?? $response->body();
+                $msg    = $response->json('error.message') ?? $response->body();
+
+                // 401 = API key salah/expired, tidak perlu coba model lain
+                if ($status === 401) {
+                    throw new \Exception(
+                        "API Key Gemini tidak valid atau sudah kedaluwarsa. " .
+                        "Silakan perbarui GEMINI_API_KEY di file .env dengan key baru dari https://aistudio.google.com/apikey"
+                    );
+                }
+
                 $lastError = "Model {$model} [HTTP {$status}]: {$msg}";
                 Log::warning("Gemini API failover: {$lastError}");
+            } catch (\Exception $e) {
+                // Re-throw exception yang sudah kita buat (401 dll)
+                throw $e;
             } catch (\Throwable $e) {
                 $lastError = "Exception on {$model}: " . $e->getMessage();
                 Log::warning($lastError);
