@@ -21,6 +21,8 @@ Route::group([], function () {
     Route::post('/upload', [UploadController::class, 'store'])->name('upload.store');
     Route::get('/upload/preview/{id}', [UploadController::class, 'preview'])->name('upload.preview');
     Route::post('/upload/confirm/{id}', [UploadController::class, 'confirm'])->name('upload.confirm');
+    Route::get('/upload/processing/{id}', [UploadController::class, 'processing'])->name('upload.processing');
+    Route::get('/upload/ocr-status/{id}', [UploadController::class, 'ocrStatus'])->name('upload.ocr-status');
     
     // Data Realisasi & Export
     Route::get('/realisasi', [RealisasiController::class, 'index'])->name('retribusi.index');

@@ -40,40 +40,16 @@ class GeminiOcrService {
         $base64Pdf = base64_encode($pdfBytes);
 
         $prompt = <<<PROMPT
-Anda adalah asisten ahli akuntansi pemerintah daerah di Indonesia (Permendagri / Bagan Akun Standar).
-Periksa seluruh tabel Laporan Realisasi APBD pada dokumen PDF terlampir.
+Kamu ahli akuntansi pemerintah daerah Indonesia. Dari PDF laporan realisasi APBD ini, ekstrak HANYA rekening kode 4.1.02 (Retribusi Daerah) beserta semua sub-rinciannya.
 
-FOKUS EKSTRAKSI:
-Cari dan ekstrak SEMUA baris rekening pada tabel yang memiliki KODE REKENING berawalan:
-"4.1.02" (RETRIBUSI DAERAH) beserta seluruh rincian dan sub-rinciannya!
+ATURAN:
+- Ambil semua baris dengan kode rekening awalan "4.1.02" (termasuk 4.1.02.01, 4.1.02.02, 4.1.02.03 dan sub-rinciannya)
+- ABAIKAN rekening lain (4.1.01 Pajak, 4.1.03, 4.1.04, belanja 5.x, pembiayaan 6.x)
+- Nilai rupiah: "850.000.000,00" → 850000000 | "42,67" → 42.67 | strip/kosong → 0
+- level_rekening: 4.1.02=kelompok, 4.1.02.01=jenis, 4.1.02.01.x=objek, lebih dalam=rincian
 
-Catatan penting:
-1. Pos 4.1.02 Retribusi Daerah biasanya berada di halaman 2 dari laporan pendapatan, mencakup:
-   - 4.1.02 Retribusi Daerah
-   - 4.1.02.01 Retribusi Jasa Umum (Kesehatan, Persampahan/Kebersihan, Parkir Tepi Jalan Umum, Pasar, dll.)
-   - 4.1.02.02 Retribusi Jasa Usaha (Kekayaan Daerah, Khusus Parkir, Rumah Potong Hewan, Rekreasi/Olahraga, Pemanfaatan Aset, dll.)
-   - 4.1.02.03 Retribusi Perizinan Tertentu (Persetujuan Bangunan Gedung / PBG, dll.)
-2. JANGAN ambil rekening di luar 4.1.02 (abaikan Pajak 4.1.01, Hasil Pengelolaan 4.1.03, Lain-lain PAD 4.1.04, Belanja 5.x, Pembiayaan 6.x).
-3. Bersihkan nilai rupiah Indonesia:
-   - "850.000.000,00" menjadi angka 850000000
-   - "362.750.000,00" menjadi 362750000
-   - "42,67" menjadi 42.67
-   - Jika "0,00" atau strip "-" jadikan 0
-
-Format output WAJIB HANYA berupa JSON valid persis seperti ini:
-{
-  "retribusi": [
-    {
-      "kode_rekening": "4.1.02.01.04.0001",
-      "nama_retribusi": "Retribusi Penyediaan Pelayanan Parkir di Tepi Jalan Umum",
-      "anggaran": 850000000,
-      "realisasi": 362750000,
-      "persentase": 42.67,
-      "realisasi_lalu": 665178000,
-      "level_rekening": "rincian"
-    }
-  ]
-}
+Output JSON saja, tanpa teks lain:
+{"retribusi":[{"kode_rekening":"4.1.02.01","nama_retribusi":"...","anggaran":0,"realisasi":0,"persentase":0,"realisasi_lalu":0,"level_rekening":"jenis"}]}
 PROMPT;
 
         $payload = [
