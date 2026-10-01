@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750" fill="none">
+  <rect width="600" height="750" fill="#F8F8F8"/>
+  <rect x="30" y="30" width="540" height="690" fill="white" stroke="#111111" stroke-width="2"/>
+  <rect x="40" y="40" width="520" height="670" fill="none" stroke="#E5E5E5" stroke-width="1"/>
+  <path d="M270 320L300 280L330 320" stroke="#767676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="260" y="320" width="80" height="70" rx="4" stroke="#767676" stroke-width="2" fill="none"/>
+  <circle cx="300" cy="345" r="12" stroke="#767676" stroke-width="2" fill="none"/>
+  <text x="300" y="430" text-anchor="middle" fill="#111111" font-family="Playfair Display, Georgia, serif" font-size="20" font-weight="bold" letter-spacing="2">RETRO THREADS</text>
+  <text x="300" y="460" text-anchor="middle" fill="#767676" font-family="Courier Prime, monospace" font-size="14" letter-spacing="1">NO IMAGE AVAILABLE</text>
+</svg>
